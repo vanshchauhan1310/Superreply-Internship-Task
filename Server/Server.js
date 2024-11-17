@@ -142,6 +142,10 @@ app.post('/api/synthesize', upload.single('voiceFile'), async (req, res) => {
   }
 });
 
+app.get('/',(req,res)=>{
+  res.send('Hello World!')
+})
+
 // Update the status check endpoint
 app.get('/api/check-file/:filename', async (req, res) => {
   try {
