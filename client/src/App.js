@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
+const API_BASE_URL = 'https://super-reply-task-backend.onrender.com';
+
 export default function VoiceSynthesizer() {
   const [text, setText] = useState('');
   const [file, setFile] = useState(null);
@@ -52,7 +54,7 @@ export default function VoiceSynthesizer() {
 
   const checkFileStatus = async (fileName) => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/check-file/${fileName}`);
+      const response = await axios.get(`${API_BASE_URL}/api/check-file/${fileName}`);
       
       if (response.data.exists && response.data.url) {
         setAudioUrl(response.data.url);
@@ -84,7 +86,7 @@ export default function VoiceSynthesizer() {
     formData.append('text', text);
   
     try {
-      const response = await axios.post('http://localhost:3001/api/synthesize', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/synthesize`, formData, {
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(progress);
@@ -105,8 +107,8 @@ export default function VoiceSynthesizer() {
           if (retries >= maxRetries) {
             throw new Error('Failed to generate audio file after multiple attempts');
           }
-  
-          const statusResponse = await axios.get(`http://localhost:3001/api/check-file/${fileName}`);
+
+          const statusResponse = await axios.get(`${API_BASE_URL}/api/check-file/${fileName}`);
           
           if (statusResponse.data.exists && statusResponse.data.url) {
             setAudioUrl(statusResponse.data.url);
@@ -124,7 +126,7 @@ export default function VoiceSynthesizer() {
   
     } catch (err) {
       console.error('Error during synthesis:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err.response?.data?.message || err.message || 'An error occurred during synthesis');
       setLoading(false);
     }
   };
